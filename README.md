@@ -1,4 +1,4 @@
-anyrtc Talk Web SDK 可实现公网实时语音对讲、实时广播功能。详情请[参考官网](https://anyrtc.io/solution/education)。
+anyrtc Talk Web SDK 可实现公网实时语音对讲、实时广播功能, 详情请[文档中心](https://docs.anyrtc.io/cn/Talk/product_rtk)。
 
 ArTalk WebSDK 提供的以下 API 接口和回调:
 

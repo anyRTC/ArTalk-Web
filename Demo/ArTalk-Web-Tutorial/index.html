@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Talk Tutorial Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body,
+    .app {
+      width: 100%;
+      height: 100%;
+      /* overflow: hidden; */
+    }
+
+    .message-box {
+      min-height: 100px;
+      max-height: 300px;
+      overflow: auto;
+    }
+
+    .app {
+      position: relative;
+    }
+
+    .app .app-hd {
+      padding: 28px 30px;
+    }
+
+    .w-full {
+      width: 100%;
+    }
+
+    .h-full {
+      height: 100%;
+    }
+    
+    .h-inherit {
+      height: inherit;
+    }
+    
+    .h-1\/2 {
+      height: 50%;
+    }
+
+    .alert-view {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 1;
+    }
+
+    .msg-box-item {
+      overflow: auto;
+    }
+  </style>
+  <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+  <link href="./assets/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/animate.min.css" />
+</head>
+
+<body>
+  <div class="position-relative py-3 overflow-hidden h-inherit">
+    <!-- 弹框 -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+      </symbol>
+      <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </symbol>
+      <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+      </symbol>
+    </svg>
+    <div id="alertView" class="alert-view"></div>
+    <!--  -->
+    <div class="d-flex w-full h-full justify-content-center">
+      <div class="w-full row overflow-hidden h-inherit">
+        <!-- 左侧 1/3 -->
+        <div class="d-flex flex-column col-3 h-inherit">
+          <!-- 登录 -->
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label">APP ID</label>
+                <input class="form-control" id="appIdInput" value="">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">User ID</label>
+                <input class="form-control" id="userIdInput">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Talker Level</label>
+                <select class="form-select" aria-label="Default select example" onchange="changeLevel(this)">
+                  <option selected value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Token</label>
+                <input class="form-control" id="tokenInput">
+              </div>
+              <button type="button" class="btn btn-primary" onclick="loginSystem(this)">登录</button>
+              <button type="button" class="btn btn-primary" onclick="logoutSystem()">登出</button>
+            </div>
+          </div>
+          <!-- 日志 -->
+          <div id="logBox" class="flex-grow-1 card overflow-auto">
+            <ul id="logView" class="list-group">
+            </ul>
+          </div>
+        </div>
+        <!-- 右侧 2/3 -->
+        <div class="col d-flex flex-column overflow-hidden h-inherit">
+
+          <div class="flex-grow-1 row row-cols-2 h-1/2 mb-3">
+            <!-- 9191 -->
+            <div class="col mb-3 d-flex h-full overflow-hidden">
+              <div class="card w-full">
+                <h5 class="p-3 mb-0 card-title d-flex justify-content-between">
+                  <div>9191</div>
+                  <div class="d-flex align-items-center">
+                    <small class="m-r-3">加入</small>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" value="9191" onchange="joinOrLeaveChannel(this)">
+                    </div>
+                  </div>
+                </h5>
+                <div id="messageBox9191" class="py-0 card-body overflow-auto">
+                  <div class="card-text pb-2">
+                    <ul id="chatView9191" class="list-group">
+                    </ul>
+                  </div>
+                </div>
+                <div class="card-title p-3">
+                  <button id="talkBtn9191" type="button" class="btn btn-primary" onclick="pushToOrCancelTalk(9191, this)">上麦</button>
+                  <button type="button" class="btn btn-primary" onclick="breakTalk(9191)">打断</button>
+                </div>
+              </div>
+            </div>
+            <!-- 8181 -->
+            <div class="col mb-3 d-flex h-full overflow-hidden">
+              <div class="card w-full">
+                <h5 class="p-3 mb-0 card-title d-flex justify-content-between">
+                  <div>8181</div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" value="8181" onchange="joinOrLeaveChannel(this)">
+                  </div>
+                </h5>
+                <div id="messageBox8181" class="py-0 card-body overflow-auto">
+                  <div class="card-text pb-2">
+                    <ul id="chatView8181" class="list-group">
+                    </ul>
+                  </div>
+                </div>
+                <div class="card-title p-3">
+                  <button id="talkBtn8181" type="button" class="btn btn-primary" onclick="pushToOrCancelTalk(8181, this)">上麦</button>
+                  <button type="button" class="btn btn-primary" onclick="breakTalk(8181)">打断</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-grow-1 row row-cols-2 h-1/2">
+            <!-- 7171 -->
+            <div class="col mb-3 d-flex h-full overflow-hidden">
+              <div class="card w-full">
+                <h5 class="p-3 mb-0 card-title d-flex justify-content-between">
+                  <div>7171</div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" value="7171" onchange="joinOrLeaveChannel(this)">
+                  </div>
+                </h5>
+                <div id="messageBox7171" class="py-0 card-body overflow-auto">
+                  <div class="card-text pb-2">
+                    <ul id="chatView7171" class="list-group">
+                    </ul>
+                  </div>
+                </div>
+                <div class="card-title p-3">
+                  <button id="talkBtn7171" type="button" class="btn btn-primary" onclick="pushToOrCancelTalk(7171, this)">上麦</button>
+                  <button type="button" class="btn btn-primary" onclick="breakTalk(7171)">打断</button>
+                </div>
+              </div>
+            </div>
+            <!-- 6161 -->
+            <div class="col mb-3 d-flex h-full overflow-hidden">
+              <div class="card w-full">
+                <h5 class="p-3 mb-0 card-title d-flex justify-content-between">
+                  <div>6161</div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" value="6161" onchange="joinOrLeaveChannel(this)">
+                  </div>
+                </h5>
+                <div id="messageBox6161" class="py-0 card-body overflow-auto">
+                  <div class="card-text pb-2">
+                    <ul id="chatView6161" class="list-group">
+                    </ul>
+                  </div>
+                </div>
+                <div class="card-title p-3">
+                  <button id="talkBtn6161" type="button" class="btn btn-primary" onclick="pushToOrCancelTalk(6161, this)">上麦</button>
+                  <button type="button" class="btn btn-primary" onclick="breakTalk(6161)">打断</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./assets/js/jquery.min.js"></script>
+  <script src="./assets/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/ar-talk-sdk@latest"></script>
+  <script>
+    var isLogin = false;
+    var channels = {};
+    var talk;
+    var userLevel = 0;
+
+    // 监听回调事件
+    function initTalkListener() {
+      //通知 SDK 与 RTM 系统的连接状态发生了改变。
+      talk.on("ConnectionStateChanged", function (newState, reason) {
+
+      });
+
+      talk.on("ConnectionStateChanged", function (state, reason) {
+        printSystemLog("success", `ConnectionStateChanged ${state}. reason: ${reason}`);
+      });
+
+      //（SDK 断线重连时触发）当前使用的 RTM Token 已超过 24 小时的签发有效期。
+      talk.on("TokenWillExpired", function () {
+        console.log('TokenWillExpired');
+      });
+
+      talk.on("TokenDidExpired", function () {
+        console.log('TokenDidExpired');
+      });
+    }
+
+    function changeLevel(event) {
+      userLevel = Number(event.value);
+    }
+
+    // 登录
+    async function loginSystem(event) {
+      var USER_ID = $("#userIdInput").val();
+      var USER_TOKEN = $("#tokenInput").val();
+      var APPID = $("#appIdInput").val();
+      if (!APPID) {
+        alertMsg('danger', '请输入 APP ID');
+        return;
+      }
+      if (!USER_ID) {
+        USER_ID = Math.ceil(Math.random() * Math.pow(10, 9)).toString();
+      }
+      // 初始化 Talk 实例
+      if (!talk) {
+        // talk client------------------------
+        talk = ArTalk.createInstance(APPID, {
+          // logFilter: ArTalk.LOG_FILTER_OFF,
+          // ConfPriCloudAddr: {
+          //   ServerAdd: "talkgw.agrtc.cn",
+          //   Port: 443,
+          //   Wss: true,
+          // },
+          UserData: {
+            uid: USER_ID,
+            nickname: USER_ID
+          }
+        });
+        // 监听事件
+        initTalkListener();
+      }
+      // 登录
+      if (!isLogin) {
+        await talk.login({
+          uid: USER_ID,
+          token: USER_TOKEN ? USER_TOKEN : null
+        });
+        isLogin = true;
+        $("#userIdInput").val(USER_ID);
+        alertMsg('success', 'login success!');
+        printSystemLog("success", `login success!`);
+      }
+    }
+    // 登出
+    async function logoutSystem() {
+      if (isLogin) {
+        await talk.logout();
+        isLogin = false;
+        $("#userIdInput").val("");
+        alertMsg('success', 'logout success!');
+        printSystemLog("success", `logout success!`);
+      }
+    }
+
+    // 加入/退出频道
+    async function joinOrLeaveChannel(event) {
+      if (!talk) {
+        alertMsg('danger', '请先登录系统！');
+        var checked = $(event).prop('checked');
+        $(event).prop('checked', !checked);
+        return;
+      }
+      var channelId = event.value;
+      var doJoin = event.checked;
+      $(event).attr("disabled", true);
+      if (doJoin) {
+        var channel = createTalkChannel(channelId);
+        // 设置用户级别
+        channel.setLevel(userLevel);
+        // 监听回调
+        channel.on("UserIsTalkOn", function(channelId, userId, userData) {
+          console.log("用户上麦", channelId, userId, userData);
+          printChannelLog('success', channelId, `user ${userId} on talk.`);
+        });
+        channel.on("UserIsTalkOff", function(channelId, userId, userData) {
+          console.log("用户下麦", channelId, userId, userData);
+          printChannelLog('success', channelId, `user ${userId} off talk.`);
+        });
+        channel.on("BreakTalk", function() {
+          console.log("上麦被打断");
+          //
+          Object.keys(channels).forEach(function(channelId) {
+            channels[channelId].onTalk = false;
+            $(`#talkBtn${channelId}`).html("上麦");
+            printChannelLog('success', channelId, `talk is break by remote.`);
+          });
+        });
+        await channel.join();
+        // 存储
+        channels[channelId] = {
+          instance: channel,
+          joined: true,
+          onTalk: false
+        };
+        printChannelLog("success", channelId, "Join channel success!");
+      } else {
+        var channel = channels[channelId];
+        await channel.instance.leave();
+        delete channels[channelId];
+        printChannelLog("success", channelId, "leave channel success!");
+      }
+      $(event).attr("disabled", false);
+    }
+
+    // 申请对讲
+    async function pushToOrCancelTalk(channelId, event) {
+      if (channels[channelId] && channels[channelId].joined) {
+        if (!channels[channelId].onTalk) {
+          await channels[channelId].instance.pushToTalk();
+          printChannelLog('success', channelId, 'push to talk success');
+          channels[channelId].onTalk = true;
+          $(event).html('下麦');
+        } else {
+          await channels[channelId].instance.stopPushToTalk();
+          printChannelLog('success', channelId, 'stop push to talk success');
+          channels[channelId].onTalk = false;
+          $(event).html('上麦');
+        }
+      } else {
+        printChannelLog('error', channelId, 'join channel first please.');
+      }
+    }
+
+    // 打断对讲
+    function breakTalk(channelId) {
+      if (channels[channelId] && channels[channelId].joined) {
+        channels[channelId].instance.breakTalk();
+        printChannelLog('success', channelId, 'break talk success.');
+      } else {
+        printChannelLog('error', channelId, 'join channel first please.');
+      }
+    }
+
+    //加入频道
+    function createTalkChannel(channelId) {
+      // talk channel-------------------------------
+      var talkChannel = talk.createChannel(channelId);
+
+      //频道属性更新回调。返回所在频道的所有属性。
+      talkChannel.on("AttributesUpdated", function (attributes) {
+        printSystemLog("info", `AttributesUpdated : ${JSON.stringify(attributes)}`);
+      });
+
+      //监听频道消息
+      talkChannel.on("ChannelMessage", function (message, peerId, messagePros) {
+        if (message.text) {
+          addMsg('Channel Text Msg', message.text);
+        } else if (message.rawMessage) {
+          addMsg('Channel Raw Msg', message.rawMessage);
+        }
+      });
+
+      //频道成员人数更新回调。
+      talkChannel.on("MemberCountUpdated", function (memberCount) {
+        printSystemLog("info", `MemberCountUpdated : ${memberCount}`);
+      });
+
+      //频道成员人数更新回调。
+      talkChannel.on("MemberJoined", function (memberId) {
+        printSystemLog("info", `MemberJoined : ${memberId}`);
+      });
+
+      //收到用户离开频道的通知。
+      talkChannel.on("MemberLeft", function (memberId) {
+        printSystemLog("info", `MemberLeft : ${memberId}`);
+      });
+
+      return talkChannel;
+    }
+
+    // tools---------------------
+    // 消息置底
+    function msgScrollBottom(channelId) {
+      $(`#messageBox${channelId}`).animate({ scrollTop: $(`#chatView${channelId}`).prop("scrollHeight") }, 200);
+    }
+
+    // 添加消息
+    function printChannelLog(label, channelId, message) {
+      var msg = $(`<li class="list-group-item msg-box-item"><span class="label label-success">${label}</span>: ${message}</li>`);
+      $(`#chatView${channelId}`).append(msg);
+      msgScrollBottom(channelId);
+    }
+
+    // 日志置底
+    function printSystemLog(type, content) {
+      var date = new Date().toLocaleTimeString();
+      var log = $(`<li class="list-group-item msg-box-item"><span class="label label-${type}">${date}</span> ${content} </li>`);
+      $("#logView").append(log);
+
+      $("#logBox").animate({ scrollTop: $("#logView").prop("scrollHeight") }, 200);
+    }
+
+    /**
+     * 弹出alert
+     * type: primary | success | danger
+    */
+    function alertMsg(type, content) {
+      var el = $(`
+        <div class="alert alert-${type} d-flex align-items-center" role="alert">
+          ${type === 'danger' ? '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>' : ''}
+          ${type === 'primary' ? '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>' : ''}
+          ${type === 'success' ? '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>' : ''}
+          <div>
+            ${content}
+          </div>
+        </div>
+      `);
+      $("#alertView").append(el);
+      setTimeout(function() {
+        el.remove();
+      }, 2e3);
+    }
+
+  </script>
+
+</body>
+
+</html>
